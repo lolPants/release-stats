@@ -1,5 +1,6 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import { NextApiRequest } from 'next'
+import { isRequestError, octo } from '~octokit'
 import { resolveQuery as rq } from '~utils/query'
 import { Middleware } from './middleware'
 
@@ -9,15 +10,23 @@ export const repo: Middleware = async (request, resp, next) => {
     return resp.status(StatusCodes.BAD_REQUEST).send(ReasonPhrases.BAD_REQUEST)
   }
 
-  const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`)
-  if (r.status === StatusCodes.OK) return next()
-  if (r.status === StatusCodes.NOT_FOUND) {
-    return resp.status(StatusCodes.NOT_FOUND).send(ReasonPhrases.NOT_FOUND)
-  }
+  try {
+    await octo.request('GET /repos/:owner/:repo', { owner, repo })
+    return next()
+  } catch (error: unknown) {
+    if (isRequestError(error)) {
+      if (error.status === StatusCodes.NOT_FOUND) {
+        return resp.status(StatusCodes.NOT_FOUND).send(ReasonPhrases.NOT_FOUND)
+      }
 
-  return resp
-    .status(StatusCodes.INTERNAL_SERVER_ERROR)
-    .send(ReasonPhrases.INTERNAL_SERVER_ERROR)
+      console.error(error)
+      return resp
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send(ReasonPhrases.INTERNAL_SERVER_ERROR)
+    }
+
+    throw error
+  }
 }
 
 export const getRepo = (request: NextApiRequest) => ({
