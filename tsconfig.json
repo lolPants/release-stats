@@ -21,6 +21,7 @@
     "baseUrl": ".",
     "paths": {
       "~middleware/*": ["lib/middleware/*"],
+      "~utils/*": ["lib/utils/*"],
       "~pages/*": ["pages/*"],
       "~api/*": ["pages/api/*"]
     }
