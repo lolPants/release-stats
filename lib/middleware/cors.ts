@@ -1,11 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { NextHandler } from 'next-connect'
+import { Middleware } from './middleware'
 
-export const cors = (
-  request: NextApiRequest,
-  resp: NextApiResponse,
-  next: NextHandler
-) => {
+export const cors: Middleware = (request, resp, next) => {
   if (request.headers.origin) {
     resp.setHeader('Access-Control-Allow-Origin', request.headers.origin)
     resp.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS')
