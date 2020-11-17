@@ -1,10 +1,9 @@
-import { Octokit } from '@octokit/rest'
 import { NextApiRequest, NextApiResponse } from 'next'
 import nc from 'next-connect'
 import { cors } from '~middleware/cors'
 import { getRepo, repo } from '~middleware/repo'
+import { octo } from '~octokit'
 
-const octo = new Octokit()
 const handler = nc<NextApiRequest, NextApiResponse>()
   .use(cors)
   .use(repo)
